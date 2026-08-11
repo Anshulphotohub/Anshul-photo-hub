@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Photo Compressor - Anshul Photo Hub</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#070b16;
+    color:#fff;
+}
+
+header{
+    padding:24px 18px;
+    text-align:center;
+    background:linear-gradient(135deg,#101936,#07101f);
+    border-bottom:1px solid #263454;
+}
+
+header h1{
+    margin:0;
+    font-size:30px;
+}
+
+header p{
+    color:#aab6d2;
+    margin:10px 0 0;
+}
+
+.container{
+    width:min(920px,94%);
+    margin:25px auto 50px;
+}
+
+.card{
+    background:#10182b;
+    border:1px solid #293958;
+    border-radius:22px;
+    padding:22px;
+    margin-bottom:20px;
+    box-shadow:0 10px 30px #0005;
+}
+
+.upload{
+    border:2px dashed #19d9f2;
+    border-radius:18px;
+    padding:35px 15px;
+    text-align:center;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.upload:hover{
+    background:#0d2034;
+}
+
+.upload .icon{
+    font-size:55px;
+}
+
+.upload h2{
+    margin:10px 0;
+}
+
+.upload p{
+    color:#aab6d2;
+}
+
+#fileInput{
+    display:none;
+}
+
+.preview{
+    display:none;
+    margin-top:20px;
+    text-align:center;
+}
+
+.preview img{
+    max-width:100%;
+    max-height:400px;
+    border-radius:15px;
+    border:1px solid #344568;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:18px;
+}
+
+.stat{
+    background:#080f20;
+    padding:15px;
+    border-radius:14px;
+    text-align:center;
+}
+
+.stat small{
+    display:block;
+    color:#9ba9c5;
+    margin-bottom:5px;
+}
+
+.stat b{
+    font-size:18px;
+}
+
+label{
+    display:block;
+    margin:18px 0 8px;
+    color:#dbe5ff;
+    font-weight:bold;
+}
+
+input[type=range]{
+    width:100%;
+    accent-color:#18d7f0;
+}
+
+.value{
+    color:#19d9f2;
+    font-weight:bold;
+}
+
+select,input[type=number]{
+    width:100%;
+    padding:13px;
+    border-radius:10px;
+    border:1px solid #344568;
+    background:#080f20;
+    color:white;
+    font-size:16px;
+}
+
+.buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:25px;
+}
+
+button{
+    border:0;
+    padding:15px;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.compress{
+    background:#18d7f0;
+    color:#06101a;
+}
+
+.download{
+    background:#22c55e;
+    color:white;
+}
+
+.reset{
+    background:#26344f;
+    color:white;
+}
+
+button:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+.result{
+    display:none;
+    text-align:center;
+}
+
+.result img{
+    max-width:100%;
+    max-height:400px;
+    border-radius:15px;
+    margin:10px 0 20px;
+}
+
+.success{
+    color:#4ade80;
+    font-weight:bold;
+    font-size:18px;
+}
+
+footer{
+    text-align:center;
+    color:#71809f;
+    padding:20px;
+}
+
+@media(max-width:600px){
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .buttons{
+        grid-template-columns:1fr;
+    }
+
+    header h1{
+        font-size:25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>📸 Photo Compressor</h1>
+    <p>Compress your photos quickly without complicated software</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<label class="upload" for="fileInput">
+    <div class="icon">📷</div>
+    <h2>Choose Your Photo</h2>
+    <p>Tap here to select JPG, JPEG, PNG or WEBP</p>
+    <input type="file" id="fileInput" accept="image/*">
+</label>
+
+<div class="preview" id="previewBox">
+    <img id="originalPreview" alt="Original Preview">
+
+    <div class="stats">
+        <div class="stat">
+            <small>Original Size</small>
+            <b id="originalSize">-</b>
+        </div>
+
+        <div class="stat">
+            <small>Dimensions</small>
+            <b id="dimensions">-</b>
+        </div>
+
+        <div class="stat">
+            <small>Format</small>
+            <b id="format">-</b>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<div class="card" id="controls" style="display:none">
+
+<h2>⚙️ Compression Settings</h2>
+
+<label>
+    Quality:
+    <span class="value" id="qualityValue">80%</span>
+</label>
+
+<input type="range" id="quality" min="10" max="100" value="80">
+
+<label>Output Format</label>
+
+<select id="formatSelect">
+    <option value="image/jpeg">JPG / JPEG</option>
+    <option value="image/webp">WEBP</option>
+    <option value="image/png">PNG</option>
+</select>
+
+<label>Maximum Width (optional)</label>
+
+<input type="number" id="maxWidth" placeholder="Example: 1920">
+
+<div class="buttons">
+    <button class="compress" id="compressBtn">
+        🚀 Compress Photo
+    </button>
+
+    <button class="reset" id="resetBtn">
+        🔄 Reset
+    </button>
+</div>
+
+</div>
+
+<div class="card result" id="resultBox">
+
+<h2>✅ Compressed Photo</h2>
+
+<img id="resultPreview" alt="Compressed Preview">
+
+<p class="success" id="savedText"></p>
+
+<div class="stats">
+    <div class="stat">
+        <small>Original</small>
+        <b id="beforeSize">-</b>
+    </div>
+
+    <div class="stat">
+        <small>Compressed</small>
+        <b id="afterSize">-</b>
+    </div>
+
+    <div class="stat">
+        <small>Reduced</small>
+        <b id="reducedSize">-</b>
+    </div>
+</div>
+
+<div class="buttons">
+    <button class="download" id="downloadBtn">
+        ⬇️ Download Photo
+    </button>
+</div>
+
+</div>
+
+</div>
+
+<footer>
+    © 2026 Anshul Photo Hub
+</footer>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const previewBox = document.getElementById("previewBox");
+const originalPreview = document.getElementById("originalPreview");
+const originalSize = document.getElementById("originalSize");
+const dimensions = document.getElementById("dimensions");
+const format = document.getElementById("format");
+
+const controls = document.getElementById("controls");
+const quality = document.getElementById("quality");
+const qualityValue = document.getElementById("qualityValue");
+const formatSelect = document.getElementById("formatSelect");
+const maxWidth = document.getElementById("maxWidth");
+
+const compressBtn = document.getElementById("compressBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+const resultBox = document.getElementById("resultBox");
+const resultPreview = document.getElementById("resultPreview");
+const beforeSize = document.getElementById("beforeSize");
+const afterSize = document.getElementById("afterSize");
+const reducedSize = document.getElementById("reducedSize");
+const savedText = document.getElementById("savedText");
+const downloadBtn = document.getElementById("downloadBtn");
+
+let selectedFile = null;
+let compressedBlob = null;
+
+function formatBytes(bytes){
+    if(bytes < 1024) return bytes + " B";
+    if(bytes < 1024 * 1024)
+        return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+}
+
+quality.addEventListener("input",()=>{
+    qualityValue.textContent = quality.value + "%";
+});
+
+fileInput.addEventListener("change", function(){
+
+    const file = this.files[0];
+
+    if(!file) return;
+
+    if(!file.type.startsWith("image/")){
+        alert("Please select an image file.");
+        return;
+    }
+
+    selectedFile = file;
+
+    const url = URL.createObjectURL(file);
+
+    originalPreview.src = url;
+
+    originalSize.textContent = formatBytes(file.size);
+    format.textContent = file.type.split("/")[1].toUpperCase();
+
+    const img = new Image();
+
+    img.onload = function(){
+        dimensions.textContent =
+            img.width + " × " + img.height;
+
+        URL.revokeObjectURL(url);
+    };
+
+    img.src = url;
+
+    previewBox.style.display = "block";
+    controls.style.display = "block";
+    resultBox.style.display = "none";
+});
+
+compressBtn.addEventListener("click",()=>{
+
+    if(!selectedFile){
+        alert("Please select a photo first.");
+        return;
+    }
+
+    const img = new Image();
+
+    img.onload = function(){
+
+        let width = img.width;
+        let height = img.height;
+
+        const requestedWidth = parseInt(maxWidth.value);
+
+        if(requestedWidth && requestedWidth > 0 && width > requestedWidth){
+
+            const ratio = requestedWidth / width;
+
+            width = requestedWidth;
+            height = Math.round(height * ratio);
+        }
+
+        const canvas = document.createElement("canvas");
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+
+        ctx.drawImage(img,0,0,width,height);
+
+        const selectedFormat = formatSelect.value;
+
+        const qualityValueNum = Number(quality.value) / 100;
+
+        canvas.toBlob(function(blob){
+
+            if(!blob){
+                alert("Compression failed. Please try again.");
+                return;
+            }
+
+            compressedBlob = blob;
+
+            resultPreview.src = URL.createObjectURL(blob);
+
+            beforeSize.textContent =
+                formatBytes(selectedFile.size);
+
+            afterSize.textContent =
+                formatBytes(blob.size);
+
+            const reduction =
+                ((selectedFile.size - blob.size) /
+                selectedFile.size) * 100;
+
+            if(reduction > 0){
+
+                reducedSize.textContent =
+                    reduction.toFixed(1) + "%";
+
+                savedText.textContent =
+                    "🎉 Your photo was reduced by " +
+                    reduction.toFixed(1) + "%";
+
+            }else{
+
+                reducedSize.textContent = "0%";
+
+                savedText.textContent =
+                    "Photo processed successfully.";
+
+            }
+
+            resultBox.style.display = "block";
+
+            resultBox.scrollIntoView({
+                behavior:"smooth"
+            });
+
+        },selectedFormat,qualityValueNum);
+
+    };
+
+    img.onerror = function(){
+        alert("Unable to read this image.");
+    };
+
+    img.src = URL.createObjectURL(selectedFile);
+});
+
+downloadBtn.addEventListener("click",()=>{
+
+    if(!compressedBlob) return;
+
+    let extension = "jpg";
+
+    if(formatSelect.value === "image/png")
+        extension = "png";
+
+    if(formatSelect.value === "image/webp")
+        extension = "webp";
+
+    const url = URL.createObjectURL(compressedBlob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+
+    a.download =
+        "Anshul-Photo-Hub-compressed." + extension;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+    setTimeout(()=>{
+        URL.revokeObjectURL(url);
+    },1000);
+});
+
+resetBtn.addEventListener("click",()=>{
+
+    selectedFile = null;
+    compressedBlob = null;
+
+    fileInput.value = "";
+
+    originalPreview.removeAttribute("src");
+    resultPreview.removeAttribute("src");
+
+    previewBox.style.display = "none";
+    controls.style.display = "none";
+    resultBox.style.display = "none";
+
+    quality.value = 80;
+    qualityValue.textContent = "80%";
+
+    maxWidth.value = "";
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+});
+</script>
+
+</body>
+</html>
