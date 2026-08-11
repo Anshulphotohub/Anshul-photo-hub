@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANSHUL PHOTO HUB</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(circle at 15% 10%,rgba(0,217,255,.12),transparent 30%),
+        radial-gradient(circle at 85% 20%,rgba(120,80,255,.12),transparent 30%),
+        #050914;
+    color:white;
+    min-height:100vh;
+}
+
+header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    backdrop-filter:blur(18px);
+    background:rgba(5,9,20,.78);
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.nav{
+    max-width:1200px;
+    margin:auto;
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:1px;
+    color:#fff;
+}
+
+.logo span{
+    color:#16d9ff;
+}
+
+nav a{
+    color:#cbd5e1;
+    text-decoration:none;
+    margin-left:20px;
+    font-size:14px;
+}
+
+nav a:hover{
+    color:#19ddff;
+}
+
+.hero{
+    max-width:1200px;
+    margin:auto;
+    padding:70px 20px 35px;
+    text-align:center;
+}
+
+.badge{
+    display:inline-block;
+    padding:8px 15px;
+    border:1px solid rgba(22,217,255,.35);
+    background:rgba(22,217,255,.08);
+    border-radius:30px;
+    color:#16d9ff;
+    font-size:13px;
+    margin-bottom:20px;
+}
+
+.hero h1{
+    font-size:clamp(38px,8vw,76px);
+    line-height:1;
+    font-weight:900;
+    background:linear-gradient(90deg,#fff,#15dfff,#9c7cff,#fff);
+    background-size:300%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:shine 5s linear infinite;
+}
+
+@keyframes shine{
+    to{background-position:300%}
+}
+
+.hero p{
+    max-width:650px;
+    margin:22px auto;
+    color:#9ca9c5;
+    font-size:18px;
+    line-height:1.6;
+}
+
+.main{
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+}
+
+.editor-card{
+    background:rgba(10,17,32,.72);
+    border:1px solid rgba(120,160,255,.25);
+    border-radius:28px;
+    padding:25px;
+    box-shadow:0 20px 80px rgba(0,0,0,.35);
+    backdrop-filter:blur(20px);
+}
+
+.preview-title{
+    text-align:center;
+    color:#9ba8c0;
+    font-size:20px;
+    margin-bottom:18px;
+}
+
+.preview{
+    width:100%;
+    min-height:390px;
+    border-radius:22px;
+    border:2px solid #263656;
+    background:#02050b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    position:relative;
+}
+
+.preview img{
+    max-width:100%;
+    max-height:520px;
+    object-fit:contain;
+    display:none;
+    position:relative;
+    z-index:2;
+}
+
+.placeholder{
+    text-align:center;
+    color:#71809c;
+    padding:30px;
+}
+
+.placeholder .camera{
+    font-size:70px;
+    margin-bottom:15px;
+}
+
+.placeholder h2{
+    color:#dce6f7;
+    margin-bottom:10px;
+}
+
+.placeholder p{
+    line-height:1.6;
+}
+
+.controls{
+    margin-top:22px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.control-box{
+    background:rgba(18,28,51,.7);
+    border:1px solid rgba(255,255,255,.08);
+    padding:20px;
+    border-radius:20px;
+}
+
+.control-box h3{
+    margin-bottom:14px;
+}
+
+input[type=file]{
+    width:100%;
+    color:#b8c4d9;
+}
+
+input[type=range]{
+    width:100%;
+    accent-color:#16d9ff;
+}
+
+.range-row{
+    margin:14px 0;
+}
+
+.range-row label{
+    display:flex;
+    justify-content:space-between;
+    color:#b7c4da;
+    font-size:14px;
+    margin-bottom:7px;
+}
+
+.buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:16px;
+}
+
+button,
+.upload-btn{
+    border:0;
+    padding:12px 18px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:700;
+    color:white;
+    background:#182641;
+    transition:.25s;
+}
+
+button:hover,
+.upload-btn:hover{
+    transform:translateY(-2px);
+    background:#23395f;
+}
+
+.primary{
+    background:linear-gradient(135deg,#00cfff,#4868ff);
+}
+
+.primary:hover{
+    background:linear-gradient(135deg,#19dcff,#637cff);
+}
+
+.danger{
+    background:#321a2a;
+}
+
+.background-buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.bg-btn{
+    padding:10px 14px;
+    border-radius:10px;
+    background:#111c34;
+    border:1px solid #2b3c60;
+}
+
+.tools{
+    padding:65px 20px;
+    max-width:1200px;
+    margin:auto;
+}
+
+.section-title{
+    text-align:center;
+    font-size:36px;
+    margin-bottom:10px;
+}
+
+.section-subtitle{
+    text-align:center;
+    color:#8795ad;
+    margin-bottom:35px;
+}
+
+.tool-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+}
+
+.tool{
+    text-decoration:none;
+    color:white;
+    background:rgba(13,22,40,.78);
+    border:1px solid rgba(100,140,220,.18);
+    border-radius:20px;
+    padding:24px 18px;
+    transition:.3s;
+}
+
+.tool:hover{
+    transform:translateY(-7px);
+    border-color:#16d9ff;
+    box-shadow:0 12px 35px rgba(0,210,255,.12);
+}
+
+.tool-icon{
+    font-size:38px;
+    margin-bottom:15px;
+}
+
+.tool h3{
+    margin-bottom:8px;
+}
+
+.tool p{
+    color:#8795ad;
+    font-size:13px;
+    line-height:1.5;
+}
+
+footer{
+    border-top:1px solid rgba(255,255,255,.08);
+    padding:30px 20px;
+    text-align:center;
+    color:#71809a;
+}
+
+.toast{
+    position:fixed;
+    bottom:25px;
+    left:50%;
+    transform:translateX(-50%) translateY(100px);
+    background:#14213b;
+    border:1px solid #2d466f;
+    padding:13px 20px;
+    border-radius:12px;
+    opacity:0;
+    transition:.3s;
+    z-index:999;
+}
+
+.toast.show{
+    transform:translateX(-50%) translateY(0);
+    opacity:1;
+}
+
+@media(max-width:800px){
+    .tool-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .controls{
+        grid-template-columns:1fr;
+    }
+
+    nav{
+        display:none;
+    }
+}
+
+@media(max-width:500px){
+    .hero{
+        padding-top:45px;
+    }
+
+    .hero p{
+        font-size:15px;
+    }
+
+    .editor-card{
+        padding:15px;
+    }
+
+    .preview{
+        min-height:330px;
+    }
+
+    .tool-grid{
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+
+    .tool{
+        padding:18px 12px;
+    }
+
+    .section-title{
+        font-size:28px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="nav">
+    <div class="logo">ANSHUL <span>PHOTO HUB</span></div>
+
+    <nav>
+        <a href="#editor">Editor</a>
+        <a href="#tools">Tools</a>
+        <a href="#about">About</a>
+    </nav>
+</div>
+</header>
+
+<section class="hero">
+    <div class="badge">✦ ALL-IN-ONE PHOTO STUDIO</div>
+
+    <h1>ANSHUL PHOTO HUB</h1>
+
+    <p>
+        Choose your photo and create a new background.
+        Edit, enhance, resize, compress and design your photos
+        with powerful online tools.
+    </p>
+</section>
+
+<main class="main" id="editor">
+
+<div class="editor-card">
+
+    <div class="preview-title">
+        Choose your photo and create a new background
+    </div>
+
+    <div class="preview" id="preview">
+
+        <div class="placeholder" id="placeholder">
+            <div class="camera">📸</div>
+            <h2>Photo Preview</h2>
+            <p>
+                Select your photo to begin<br>
+                Your photo will appear here
+            </p>
+        </div>
+
+        <img id="photoPreview" alt="Photo Preview">
+
+    </div>
+
+    <div class="controls">
+
+        <div class="control-box">
+
+            <h3>📁 Select Photos</h3>
+
+            <input
+                type="file"
+                id="photoInput"
+                accept="image/*"
+            >
+
+            <div class="buttons">
+                <button class="primary" id="downloadBtn">
+                    ⬇ Download
+                </button>
+
+                <button id="resetBtn" class="danger">
+                    ↻ Reset
+                </button>
+            </div>
+
+        </div>
+
+        <div class="control-box">
+
+            <h3>🎨 Background</h3>
+
+            <div class="background-buttons">
+
+                <button class="bg-btn" data-bg="#02050b">
+                    Black
+                </button>
+
+                <button class="bg-btn" data-bg="#ffffff">
+                    White
+                </button>
+
+                <button class="bg-btn" data-bg="#172554">
+                    Blue
+                </button>
+
+                <button class="bg-btn" data-bg="#4c1d95">
+                    Purple
+                </button>
+
+                <button class="bg-btn" data-bg="linear-gradient(135deg,#00c6ff,#7c3aed)">
+                    Gradient
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="control-box">
+
+            <h3>✨ Adjust Photo</h3>
+
+            <div class="range-row">
+                <label>
+                    <span>Brightness</span>
+                    <span id="brightnessValue">100%</span>
+                </label>
+
+                <input
+                    type="range"
+                    id="brightness"
+                    min="0"
+                    max="200"
+                    value="100"
+                >
+            </div>
+
+            <div class="range-row">
+                <label>
+                    <span>Contrast</span>
+                    <span id="contrastValue">100%</span>
+                </label>
+
+                <input
+                    type="range"
+                    id="contrast"
+                    min="0"
+                    max="200"
+                    value="100"
+                >
+            </div>
+
+            <div class="range-row">
+                <label>
+                    <span>Saturation</span>
+                    <span id="saturationValue">100%</span>
+                </label>
+
+                <input
+                    type="range"
+                    id="saturation"
+                    min="0"
+                    max="200"
+                    value="100"
+                >
+            </div>
+
+            <div class="range-row">
+                <label>
+                    <span>Blur</span>
+                    <span id="blurValue">0px</span>
+                </label>
+
+                <input
+                    type="range"
+                    id="blur"
+                    min="0"
+                    max="20"
+                    value="0"
+                >
+            </div>
+
+        </div>
+
+        <div class="control-box">
+
+            <h3>🔄 Transform</h3>
+
+            <div class="buttons">
+
+                <button id="rotateLeft">
+                    ↶ Rotate
+                </button>
+
+                <button id="rotateRight">
+                    ↷ Rotate
+                </button>
+
+                <button id="flipH">
+                    ↔ Flip H
+                </button>
+
+                <button id="flipV">
+                    ↕ Flip V
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</main>
+
+
+<section class="tools" id="tools">
+
+    <h2 class="section-title">Photo Editing Tools</h2>
+
+    <p class="section-subtitle">
+        Powerful tools for your everyday photo editing
+    </p>
+
+    <div class="tool-grid">
+
+        <a class="tool" href="photo-filters.html">
+            <div class="tool-icon">🎨</div>
+            <h3>Photo Filters</h3>
+            <p>Apply beautiful filters and effects to your photos.</p>
+        </a>
+
+        <a class="tool" href="crop-resize.html">
+            <div class="tool-icon">✂️</div>
+            <h3>Crop & Resize</h3>
+            <p>Crop, resize and prepare your images easily.</p>
+        </a>
+
+        <a class="tool" href="photo-compressor.html">
+            <div class="tool-icon">🗜️</div>
+            <h3>Photo Compressor</h3>
+            <p>Reduce image size while keeping good quality.</p>
+        </a>
+
+        <a class="tool" href="passport-photo.html">
+            <div class="tool-icon">🪪</div>
+            <h3>Passport Photo</h3>
+            <p>Create passport-size photos quickly.</p>
+        </a>
+
+        <a class="tool" href="frames.html">
+            <div class="tool-icon">🖼️</div>
+            <h3>Photo Frames</h3>
+            <p>Add stylish frames to your pictures.</p>
+        </a>
+
+        <a class="tool" href="collage-maker.html">
+            <div class="tool-icon">🧩</div>
+            <h3>Collage Maker</h3>
+            <p>Create beautiful photo collages.</p>
+        </a>
+
+        <a class="tool" href="sharing-tutorial.html">
+            <div class="tool-icon">📤</div>
+            <h3>Sharing Tutorial</h3>
+            <p>Learn how to share your edited photos.</p>
+        </a>
+
+        <a class="tool" href="index.html">
+            <div class="tool-icon">✨</div>
+            <h3>Photo Studio</h3>
+            <p>Return to the main ANSHUL PHOTO HUB studio.</p>
+        </a>
+
+    </div>
+
+</section>
+
+
+<footer id="about">
+    <h3>ANSHUL PHOTO HUB</h3>
+    <p style="margin-top:8px">
+        Your personal online photo editing studio.
+    </p>
+    <p style="margin-top:15px;font-size:12px">
+        © 2026 ANSHUL PHOTO HUB • All Rights Reserved
+    </p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+
+const photoInput = document.getElementById("photoInput");
+const photoPreview = document.getElementById("photoPreview");
+const placeholder = document.getElementById("placeholder");
+const preview = document.getElementById("preview");
+
+let rotation = 0;
+let flipX = 1;
+let flipY = 1;
+
+let currentImage = null;
+
+function showToast(message){
+
+    const toast = document.getElementById("toast");
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(()=>{
+        toast.classList.remove("show");
+    },2200);
+}
+
+
+photoInput.addEventListener("change",function(){
+
+    const file = this.files[0];
+
+    if(!file){
+        return;
+    }
+
+    if(!file.type.startsWith("image/")){
+        showToast("Please select an image file.");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+
+        currentImage = e.target.result;
+
+        photoPreview.src = currentImage;
+
+        photoPreview.style.display = "block";
+
+        placeholder.style.display = "none";
+
+        rotation = 0;
+        flipX = 1;
+        flipY = 1;
+
+        updateTransform();
+
+        showToast("Photo loaded successfully ✓");
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+
+function updateFilter(){
+
+    const brightness =
+        document.getElementById("brightness").value;
+
+    const contrast =
+        document.getElementById("contrast").value;
+
+    const saturation =
+        document.getElementById("saturation").value;
+
+    const blur =
+        document.getElementById("blur").value;
+
+    photoPreview.style.filter =
+        `brightness(${brightness}%)
+         contrast(${contrast}%)
+         saturate(${saturation}%)
+         blur(${blur}px)`;
+
+    document.getElementById("brightnessValue").textContent =
+        brightness + "%";
+
+    document.getElementById("contrastValue").textContent =
+        contrast + "%";
+
+    document.getElementById("saturationValue").textContent =
+        saturation + "%";
+
+    document.getElementById("blurValue").textContent =
+        blur + "px";
+}
+
+
+document.getElementById("brightness")
+.addEventListener("input",updateFilter);
+
+document.getElementById("contrast")
+.addEventListener("input",updateFilter);
+
+document.getElementById("saturation")
+.addEventListener("input",updateFilter);
+
+document.getElementById("blur")
+.addEventListener("input",updateFilter);
+
+
+function updateTransform(){
+
+    photoPreview.style.transform =
+        `rotate(${rotation}deg)
+         scaleX(${flipX})
+         scaleY(${flipY})`;
+}
+
+
+document.getElementById("rotateLeft")
+.addEventListener("click",()=>{
+
+    rotation -= 90;
+
+    updateTransform();
+
+});
+
+
+document.getElementById("rotateRight")
+.addEventListener("click",()=>{
+
+    rotation += 90;
+
+    updateTransform();
+
+});
+
+
+document.getElementById("flipH")
+.addEventListener("click",()=>{
+
+    flipX *= -1;
+
+    updateTransform();
+
+});
+
+
+document.getElementById("flipV")
+.addEventListener("click",()=>{
+
+    flipY *= -1;
+
+    updateTransform();
+
+});
+
+
+document.querySelectorAll(".bg-btn")
+.forEach(button=>{
+
+    button.addEventListener("click",()=>{
+
+        preview.style.background =
+            button.dataset.bg;
+
+        showToast("Background changed ✓");
+
+    });
+
+});
+
+
+document.getElementById("resetBtn")
+.addEventListener("click",()=>{
+
+    photoInput.value = "";
+
+    photoPreview.src = "";
+
+    photoPreview.style.display = "none";
+
+    placeholder.style.display = "block";
+
+    rotation = 0;
+
+    flipX = 1;
+
+    flipY = 1;
+
+    document.getElementById("brightness").value = 100;
+    document.getElementById("contrast").value = 100;
+    document.getElementById("saturation").value = 100;
+    document.getElementById("blur").value = 0;
+
+    preview.style.background = "#02050b";
+
+    updateFilter();
+    updateTransform();
+
+    showToast("Editor reset ✓");
+
+});
+
+
+/* DOWNLOAD */
+
+document.getElementById("downloadBtn")
+.addEventListener("click",()=>{
+
+    if(!currentImage){
+
+        showToast("First select a photo.");
+
+        return;
+    }
+
+    const canvas = document.createElement("canvas");
+
+    const ctx = canvas.getContext("2d");
+
+    const image = new Image();
+
+    image.onload = function(){
+
+        const angle =
+            ((rotation % 360) + 360) % 360;
+
+        if(angle === 90 || angle === 270){
+
+            canvas.width = image.height;
+            canvas.height = image.width;
+
+        }else{
+
+            canvas.width = image.width;
+            canvas.height = image.height;
+
+        }
+
+        ctx.save();
+
+        ctx.translate(
+            canvas.width / 2,
+            canvas.height / 2
+        );
+
+        ctx.rotate(rotation * Math.PI / 180);
+
+        ctx.scale(flipX,flipY);
+
+        const brightness =
+            document.getElementById("brightness").value;
+
+        const contrast =
+            document.getElementById("contrast").value;
+
+        const saturation =
+            document.getElementById("saturation").value;
+
+        const blur =
+            document.getElementById("blur").value;
+
+        ctx.filter =
+            `brightness(${brightness}%)
+             contrast(${contrast}%)
+             saturate(${saturation}%)
+             blur(${blur}px)`;
+
+        ctx.drawImage(
+            image,
+            -image.width/2,
+            -image.height/2
+        );
+
+        ctx.restore();
+
+        const link =
+            document.createElement("a");
+
+        link.download =
+            "anshul-photo-hub-edited.jpg";
+
+        link.href =
+            canvas.toDataURL("image/jpeg",0.92);
+
+        link.click();
+
+        showToast("Photo downloaded ✓");
+
+    };
+
+    image.src = currentImage;
+
+});
+
+</script>
+
+</body>
+  </html>
