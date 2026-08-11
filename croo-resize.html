@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Crop & Resize - Anshul Photo Hub</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    color:white;
+    background:linear-gradient(135deg,#07111f,#1e1b4b,#581c87);
+}
+
+header{
+    padding:16px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(0,0,0,.35);
+    position:sticky;
+    top:0;
+    z-index:20;
+}
+
+.logo{
+    font-size:20px;
+    font-weight:bold;
+}
+
+.home{
+    color:white;
+    text-decoration:none;
+    background:rgba(255,255,255,.15);
+    padding:9px 14px;
+    border-radius:10px;
+}
+
+.container{
+    width:min(1100px,94%);
+    margin:auto;
+    padding:25px 0 50px;
+}
+
+.title{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.title h1{
+    font-size:32px;
+    margin-bottom:8px;
+}
+
+.title p{
+    opacity:.8;
+}
+
+.card{
+    background:rgba(255,255,255,.09);
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:20px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.upload{
+    text-align:center;
+    padding:25px;
+    border:2px dashed rgba(255,255,255,.35);
+    border-radius:16px;
+}
+
+#fileInput{
+    display:none;
+}
+
+.upload label{
+    display:inline-block;
+    padding:13px 24px;
+    border-radius:12px;
+    background:linear-gradient(90deg,#7c3aed,#ec4899);
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.editor{
+    display:none;
+    grid-template-columns:1.5fr 1fr;
+    gap:20px;
+}
+
+.preview{
+    min-height:420px;
+    background:#111827;
+    border-radius:18px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    padding:15px;
+}
+
+canvas{
+    max-width:100%;
+    max-height:600px;
+    background:white;
+    border-radius:8px;
+}
+
+.controls{
+    padding:18px;
+    background:rgba(255,255,255,.06);
+    border-radius:18px;
+}
+
+.control{
+    margin-bottom:17px;
+}
+
+.control label{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:7px;
+    font-size:14px;
+}
+
+select,
+input[type=number]{
+    width:100%;
+    padding:11px;
+    border-radius:10px;
+    border:1px solid #475569;
+    background:#0f172a;
+    color:white;
+}
+
+input[type=range]{
+    width:100%;
+}
+
+.buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:15px;
+}
+
+button{
+    border:0;
+    padding:12px;
+    border-radius:10px;
+    color:white;
+    background:#334155;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    opacity:.85;
+}
+
+.download{
+    width:100%;
+    margin-top:12px;
+    background:#16a34a;
+}
+
+.reset{
+    width:100%;
+    margin-top:8px;
+    background:#dc2626;
+}
+
+.info{
+    text-align:center;
+    margin-top:12px;
+    font-size:13px;
+    opacity:.7;
+}
+
+@media(max-width:800px){
+    .editor{
+        grid-template-columns:1fr;
+    }
+
+    .preview{
+        min-height:300px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">📸 Anshul Photo Hub</div>
+    <a href="index.html" class="home">← Home</a>
+</header>
+
+<div class="container">
+
+<div class="title">
+    <h1>✂️ Crop & Resize</h1>
+    <p>Crop, resize and transform your photos</p>
+</div>
+
+<div class="card">
+
+<div class="upload">
+
+<input
+    type="file"
+    id="fileInput"
+    accept="image/*"
+>
+
+<label for="fileInput">
+    📁 Choose Photo
+</label>
+
+<p style="margin-top:10px">
+    JPG • PNG • WEBP
+</p>
+
+</div>
+
+</div>
+
+<div class="card editor" id="editor">
+
+<div class="preview">
+    <canvas id="canvas"></canvas>
+</div>
+
+<div class="controls">
+
+<h2 style="margin-bottom:18px">
+    ⚙️ Settings
+</h2>
+
+<div class="control">
+
+<label>Aspect Ratio</label>
+
+<select id="ratio">
+
+<option value="free">Free</option>
+<option value="1:1">1 : 1</option>
+<option value="4:3">4 : 3</option>
+<option value="3:4">3 : 4</option>
+<option value="16:9">16 : 9</option>
+<option value="9:16">9 : 16</option>
+
+</select>
+
+</div>
+
+<div class="control">
+
+<label>
+Zoom
+<span id="zoomText">100%</span>
+</label>
+
+<input
+    type="range"
+    id="zoom"
+    min="50"
+    max="200"
+    value="100"
+>
+
+</div>
+
+<div class="control">
+
+<label>Output Width</label>
+
+<input
+    type="number"
+    id="outWidth"
+    min="100"
+    max="5000"
+    value="1080"
+>
+
+</div>
+
+<div class="control">
+
+<label>Output Height</label>
+
+<input
+    type="number"
+    id="outHeight"
+    min="100"
+    max="5000"
+    value="1080"
+>
+
+</div>
+
+<div class="buttons">
+
+<button onclick="rotate(-90)">
+    ↶ Rotate
+</button>
+
+<button onclick="rotate(90)">
+    ↷ Rotate
+</button>
+
+<button onclick="flipHorizontal()">
+    ↔ Flip
+</button>
+
+<button onclick="centerImage()">
+    🎯 Center
+</button>
+
+</div>
+
+<button
+    class="download"
+    onclick="downloadPhoto()"
+>
+    ⬇️ Download Cropped Photo
+</button>
+
+<button
+    class="reset"
+    onclick="resetAll()"
+>
+    ♻️ Reset
+</button>
+
+<div class="info">
+    Crop preview updates automatically
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const fileInput =
+document.getElementById("fileInput");
+
+const canvas =
+document.getElementById("canvas");
+
+const ctx =
+canvas.getContext("2d");
+
+const editor =
+document.getElementById("editor");
+
+const ratio =
+document.getElementById("ratio");
+
+const zoom =
+document.getElementById("zoom");
+
+const zoomText =
+document.getElementById("zoomText");
+
+const outWidth =
+document.getElementById("outWidth");
+
+const outHeight =
+document.getElementById("outHeight");
+
+let img = new Image();
+
+let loaded = false;
+
+let rotation = 0;
+
+let flipX = 1;
+
+
+/* ---------------------------
+   LOAD PHOTO
+---------------------------- */
+
+fileInput.addEventListener(
+"change",
+function(){
+
+    const file = this.files[0];
+
+    if(!file) return;
+
+    if(!file.type.startsWith("image/")){
+
+        alert("Please select an image.");
+
+        return;
+    }
+
+    const reader =
+    new FileReader();
+
+    reader.onload =
+    function(e){
+
+        img.onload =
+        function(){
+
+            loaded = true;
+
+            editor.style.display =
+            "grid";
+
+            outWidth.value =
+            Math.min(img.naturalWidth,1080);
+
+            outHeight.value =
+            Math.min(img.naturalHeight,1080);
+
+            draw();
+
+            editor.scrollIntoView({
+                behavior:"smooth"
+            });
+
+        };
+
+        img.src = e.target.result;
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+
+/* ---------------------------
+   ASPECT RATIO
+---------------------------- */
+
+ratio.addEventListener(
+"change",
+function(){
+
+    if(!loaded) return;
+
+    const r =
+    this.value;
+
+    if(r==="free"){
+
+        draw();
+
+        return;
+    }
+
+    const parts =
+    r.split(":");
+
+    const rw =
+    Number(parts[0]);
+
+    const rh =
+    Number(parts[1]);
+
+    const width =
+    Number(outWidth.value);
+
+    outHeight.value =
+    Math.round(width*rh/rw);
+
+    draw();
+
+});
+
+
+/* ---------------------------
+   CONTROLS
+---------------------------- */
+
+zoom.addEventListener(
+"input",
+function(){
+
+    zoomText.textContent =
+    this.value+"%";
+
+    draw();
+
+});
+
+outWidth.addEventListener(
+"input",
+draw
+);
+
+outHeight.addEventListener(
+"input",
+draw
+);
+
+
+/* ---------------------------
+   GET CROP SIZE
+---------------------------- */
+
+function getCropSize(){
+
+    let iw =
+    img.naturalWidth;
+
+    let ih =
+    img.naturalHeight;
+
+    const selected =
+    ratio.value;
+
+    if(selected==="free"){
+
+        return {
+            w:iw,
+            h:ih
+        };
+
+    }
+
+    const p =
+    selected.split(":");
+
+    const rw =
+    Number(p[0]);
+
+    const rh =
+    Number(p[1]);
+
+    let w=iw;
+
+    let h=w*rh/rw;
+
+    if(h>ih){
+
+        h=ih;
+
+        w=h*rw/rh;
+
+    }
+
+    return {
+        w:w,
+        h:h
+    };
+
+}
+
+
+/* ---------------------------
+   DRAW
+---------------------------- */
+
+function draw(){
+
+    if(!loaded) return;
+
+    const crop =
+    getCropSize();
+
+    const scale =
+    Number(zoom.value)/100;
+
+    const sourceW =
+    crop.w/scale;
+
+    const sourceH =
+    crop.h/scale;
+
+    let sx =
+    (img.naturalWidth-sourceW)/2;
+
+    let sy =
+    (img.naturalHeight-sourceH)/2;
+
+    sx =
+    Math.max(0,sx);
+
+    sy =
+    Math.max(0,sy);
+
+    const w =
+    Number(outWidth.value);
+
+    const h =
+    Number(outHeight.value);
+
+    canvas.width =
+    w;
+
+    canvas.height =
+    h;
+
+    ctx.fillStyle =
+    "white";
+
+    ctx.fillRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+    ctx.save();
+
+    ctx.translate(
+        w/2,
+        h/2
+    );
+
+    ctx.rotate(
+        rotation*Math.PI/180
+    );
+
+    ctx.scale(
+        flipX,
+        1
+    );
+
+    let drawW = w;
+    let drawH = h;
+
+    ctx.drawImage(
+        img,
+        sx,
+        sy,
+        sourceW,
+        sourceH,
+        -drawW/2,
+        -drawH/2,
+        drawW,
+        drawH
+    );
+
+    ctx.restore();
+
+}
+
+
+/* ---------------------------
+   ROTATE
+---------------------------- */
+
+function rotate(deg){
+
+    if(!loaded) return;
+
+    rotation += deg;
+
+    draw();
+
+}
+
+
+/* ---------------------------
+   FLIP
+---------------------------- */
+
+function flipHorizontal(){
+
+    if(!loaded) return;
+
+    flipX *= -1;
+
+    draw();
+
+}
+
+
+/* ---------------------------
+   CENTER
+---------------------------- */
+
+function centerImage(){
+
+    rotation = 0;
+
+    flipX = 1;
+
+    zoom.value = 100;
+
+    zoomText.textContent =
+    "100%";
+
+    draw();
+
+}
+
+
+/* ---------------------------
+   DOWNLOAD
+---------------------------- */
+
+function downloadPhoto(){
+
+    if(!loaded){
+
+        alert(
+            "Please choose a photo first."
+        );
+
+        return;
+    }
+
+    const link =
+    document.createElement("a");
+
+    link.download =
+    "Anshul-Photo-Hub-Cropped.png";
+
+    link.href =
+    canvas.toDataURL(
+        "image/png"
+    );
+
+    link.click();
+
+}
+
+
+/* ---------------------------
+   RESET
+---------------------------- */
+
+function resetAll(){
+
+    rotation = 0;
+
+    flipX = 1;
+
+    zoom.value = 100;
+
+    zoomText.textContent =
+    "100%";
+
+    ratio.value = "free";
+
+    if(loaded){
+
+        outWidth.value =
+        Math.min(img.naturalWidth,1080);
+
+        outHeight.value =
+        Math.min(img.naturalHeight,1080);
+
+        draw();
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
