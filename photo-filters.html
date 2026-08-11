@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Photo Filters - Anshul Photo Hub</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#070b16;
+  color:#fff;
+}
+
+header{
+  text-align:center;
+  padding:25px 15px;
+  background:linear-gradient(135deg,#101a38,#07101f);
+  border-bottom:1px solid #293957;
+}
+
+header h1{
+  margin:0;
+  font-size:30px;
+}
+
+header p{
+  color:#aab6d2;
+  margin:10px 0 0;
+}
+
+.container{
+  width:min(950px,94%);
+  margin:25px auto 50px;
+}
+
+.card{
+  background:#10182b;
+  border:1px solid #293957;
+  border-radius:22px;
+  padding:22px;
+  margin-bottom:20px;
+  box-shadow:0 10px 30px #0005;
+}
+
+.upload{
+  border:2px dashed #19d9f2;
+  border-radius:18px;
+  padding:35px 15px;
+  text-align:center;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.upload:hover{
+  background:#0d2034;
+}
+
+.upload .icon{
+  font-size:52px;
+}
+
+.upload h2{
+  margin:10px 0;
+}
+
+.upload p{
+  color:#aab6d2;
+}
+
+#fileInput{
+  display:none;
+}
+
+.editor{
+  display:none;
+}
+
+.canvasBox{
+  background:#050914;
+  border-radius:18px;
+  padding:12px;
+  text-align:center;
+  overflow:hidden;
+}
+
+canvas{
+  max-width:100%;
+  max-height:500px;
+  border-radius:12px;
+}
+
+.presets{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:15px;
+}
+
+.preset{
+  background:#1b2842;
+  color:#fff;
+  border:1px solid #344568;
+  padding:12px 5px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.preset:hover{
+  background:#263957;
+}
+
+.control{
+  margin-top:20px;
+}
+
+.controlTop{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:7px;
+}
+
+.controlTop span:last-child{
+  color:#19d9f2;
+  font-weight:bold;
+}
+
+input[type=range]{
+  width:100%;
+  accent-color:#19d9f2;
+}
+
+.buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:25px;
+}
+
+button{
+  border:0;
+  border-radius:12px;
+  padding:15px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.download{
+  background:#22c55e;
+  color:#fff;
+}
+
+.reset{
+  background:#26344f;
+  color:#fff;
+}
+
+footer{
+  text-align:center;
+  color:#71809f;
+  padding:20px;
+}
+
+@media(max-width:600px){
+  .presets{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .buttons{
+    grid-template-columns:1fr;
+  }
+
+  header h1{
+    font-size:25px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🎨 Photo Filters</h1>
+  <p>Give your photos beautiful effects instantly</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+
+    <label class="upload" for="fileInput">
+      <div class="icon">📷</div>
+      <h2>Choose Your Photo</h2>
+      <p>JPG, PNG, JPEG or WEBP</p>
+      <input type="file" id="fileInput" accept="image/*">
+    </label>
+
+  </div>
+
+  <div class="card editor" id="editor">
+
+    <h2>✨ Filter Presets</h2>
+
+    <div class="presets">
+
+      <button class="preset" data-preset="normal">
+        Original
+      </button>
+
+      <button class="preset" data-preset="vintage">
+        Vintage
+      </button>
+
+      <button class="preset" data-preset="bw">
+        B&W
+      </button>
+
+      <button class="preset" data-preset="warm">
+        Warm
+      </button>
+
+      <button class="preset" data-preset="cool">
+        Cool
+      </button>
+
+      <button class="preset" data-preset="dramatic">
+        Dramatic
+      </button>
+
+      <button class="preset" data-preset="fade">
+        Fade
+      </button>
+
+      <button class="preset" data-preset="cinematic">
+        Cinematic
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="card editor" id="controls">
+
+    <h2>🎛️ Adjust Photo</h2>
+
+    <div class="control">
+      <div class="controlTop">
+        <span>Brightness</span>
+        <span id="brightnessValue">100%</span>
+      </div>
+      <input type="range" id="brightness" min="0" max="200" value="100">
+    </div>
+
+    <div class="control">
+      <div class="controlTop">
+        <span>Contrast</span>
+        <span id="contrastValue">100%</span>
+      </div>
+      <input type="range" id="contrast" min="0" max="200" value="100">
+    </div>
+
+    <div class="control">
+      <div class="controlTop">
+        <span>Saturation</span>
+        <span id="saturationValue">100%</span>
+      </div>
+      <input type="range" id="saturation" min="0" max="200" value="100">
+    </div>
+
+    <div class="control">
+      <div class="controlTop">
+        <span>Blur</span>
+        <span id="blurValue">0px</span>
+      </div>
+      <input type="range" id="blur" min="0" max="10" value="0">
+    </div>
+
+    <div class="control">
+      <div class="controlTop">
+        <span>Grayscale</span>
+        <span id="grayscaleValue">0%</span>
+      </div>
+      <input type="range" id="grayscale" min="0" max="100" value="0">
+    </div>
+
+    <div class="control">
+      <div class="controlTop">
+        <span>Sepia</span>
+        <span id="sepiaValue">0%</span>
+      </div>
+      <input type="range" id="sepia" min="0" max="100" value="0">
+    </div>
+
+    <div class="control">
+      <div class="controlTop">
+        <span>Hue</span>
+        <span id="hueValue">0°</span>
+      </div>
+      <input type="range" id="hue" min="-180" max="180" value="0">
+    </div>
+
+    <div class="control">
+      <div class="controlTop">
+        <span>Opacity</span>
+        <span id="opacityValue">100%</span>
+      </div>
+      <input type="range" id="opacity" min="10" max="100" value="100">
+    </div>
+
+  </div>
+
+  <div class="card editor" id="previewCard">
+
+    <h2>👁️ Preview</h2>
+
+    <div class="canvasBox">
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="buttons">
+
+      <button class="download" id="downloadBtn">
+        ⬇️ Download Photo
+      </button>
+
+      <button class="reset" id="resetBtn">
+        🔄 Reset Filters
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Anshul Photo Hub
+</footer>
+
+<script>
+
+const fileInput = document.getElementById("fileInput");
+
+const editor = document.getElementById("editor");
+const controls = document.getElementById("controls");
+const previewCard = document.getElementById("previewCard");
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const brightness = document.getElementById("brightness");
+const contrast = document.getElementById("contrast");
+const saturation = document.getElementById("saturation");
+const blur = document.getElementById("blur");
+const grayscale = document.getElementById("grayscale");
+const sepia = document.getElementById("sepia");
+const hue = document.getElementById("hue");
+const opacity = document.getElementById("opacity");
+
+const brightnessValue = document.getElementById("brightnessValue");
+const contrastValue = document.getElementById("contrastValue");
+const saturationValue = document.getElementById("saturationValue");
+const blurValue = document.getElementById("blurValue");
+const grayscaleValue = document.getElementById("grayscaleValue");
+const sepiaValue = document.getElementById("sepiaValue");
+const hueValue = document.getElementById("hueValue");
+const opacityValue = document.getElementById("opacityValue");
+
+const downloadBtn = document.getElementById("downloadBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+let image = new Image();
+let originalFile = null;
+
+
+/* =========================
+   IMAGE SELECT
+========================= */
+
+fileInput.addEventListener("change", function(){
+
+  const file = this.files[0];
+
+  if(!file) return;
+
+  if(!file.type.startsWith("image/")){
+    alert("Please select an image.");
+    return;
+  }
+
+  originalFile = file;
+
+  const url = URL.createObjectURL(file);
+
+  image.onload = function(){
+
+    canvas.width = image.width;
+    canvas.height = image.height;
+
+    resetFilters();
+
+    editor.style.display = "block";
+    controls.style.display = "block";
+    previewCard.style.display = "block";
+
+    drawImage();
+
+    URL.revokeObjectURL(url);
+
+    previewCard.scrollIntoView({
+      behavior:"smooth"
+    });
+
+  };
+
+  image.src = url;
+
+});
+
+
+/* =========================
+   FILTER DRAW
+========================= */
+
+function drawImage(){
+
+  if(!image.src) return;
+
+  const filter =
+    `brightness(${brightness.value}%)
+     contrast(${contrast.value}%)
+     saturate(${saturation.value}%)
+     blur(${blur.value}px)
+     grayscale(${grayscale.value}%)
+     sepia(${sepia.value}%)
+     hue-rotate(${hue.value}deg)`;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  ctx.save();
+
+  ctx.filter = filter;
+  ctx.globalAlpha = Number(opacity.value) / 100;
+
+  ctx.drawImage(
+    image,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  ctx.restore();
+
+}
+
+
+/* =========================
+   RANGE CONTROLS
+========================= */
+
+function updateValues(){
+
+  brightnessValue.textContent =
+    brightness.value + "%";
+
+  contrastValue.textContent =
+    contrast.value + "%";
+
+  saturationValue.textContent =
+    saturation.value + "%";
+
+  blurValue.textContent =
+    blur.value + "px";
+
+  grayscaleValue.textContent =
+    grayscale.value + "%";
+
+  sepiaValue.textContent =
+    sepia.value + "%";
+
+  hueValue.textContent =
+    hue.value + "°";
+
+  opacityValue.textContent =
+    opacity.value + "%";
+
+}
+
+
+const sliders = [
+  brightness,
+  contrast,
+  saturation,
+  blur,
+  grayscale,
+  sepia,
+  hue,
+  opacity
+];
+
+sliders.forEach(slider=>{
+
+  slider.addEventListener("input",()=>{
+
+    updateValues();
+    drawImage();
+
+  });
+
+});
+
+
+/* =========================
+   PRESETS
+========================= */
+
+const presets = {
+
+  normal:{
+    brightness:100,
+    contrast:100,
+    saturation:100,
+    blur:0,
+    grayscale:0,
+    sepia:0,
+    hue:0,
+    opacity:100
+  },
+
+  vintage:{
+    brightness:105,
+    contrast:105,
+    saturation:80,
+    blur:0,
+    grayscale:0,
+    sepia:55,
+    hue:0,
+    opacity:100
+  },
+
+  bw:{
+    brightness:105,
+    contrast:115,
+    saturation:0,
+    blur:0,
+    grayscale:100,
+    sepia:0,
+    hue:0,
+    opacity:100
+  },
+
+  warm:{
+    brightness:105,
+    contrast:105,
+    saturation:125,
+    blur:0,
+    grayscale:0,
+    sepia:20,
+    hue:-10,
+    opacity:100
+  },
+
+  cool:{
+    brightness:100,
+    contrast:110,
+    saturation:110,
+    blur:0,
+    grayscale:0,
+    sepia:0,
+    hue:25,
+    opacity:100
+  },
+
+  dramatic:{
+    brightness:90,
+    contrast:150,
+    saturation:120,
+    blur:0,
+    grayscale:10,
+    sepia:0,
+    hue:0,
+    opacity:100
+  },
+
+  fade:{
+    brightness:115,
+    contrast:80,
+    saturation:75,
+    blur:0,
+    grayscale:0,
+    sepia:10,
+    hue:0,
+    opacity:100
+  },
+
+  cinematic:{
+    brightness:95,
+    contrast:125,
+    saturation:90,
+    blur:0,
+    grayscale:5,
+    sepia:12,
+    hue:-5,
+    opacity:100
+  }
+
+};
+
+
+document.querySelectorAll(".preset").forEach(button=>{
+
+  button.addEventListener("click",()=>{
+
+    const preset =
+      presets[button.dataset.preset];
+
+    brightness.value = preset.brightness;
+    contrast.value = preset.contrast;
+    saturation.value = preset.saturation;
+    blur.value = preset.blur;
+    grayscale.value = preset.grayscale;
+    sepia.value = preset.sepia;
+    hue.value = preset.hue;
+    opacity.value = preset.opacity;
+
+    updateValues();
+    drawImage();
+
+  });
+
+});
+
+
+/* =========================
+   RESET
+========================= */
+
+function resetFilters(){
+
+  brightness.value = 100;
+  contrast.value = 100;
+  saturation.value = 100;
+  blur.value = 0;
+  grayscale.value = 0;
+  sepia.value = 0;
+  hue.value = 0;
+  opacity.value = 100;
+
+  updateValues();
+
+}
+
+
+resetBtn.addEventListener("click",()=>{
+
+  resetFilters();
+  drawImage();
+
+});
+
+
+/* =========================
+   DOWNLOAD
+========================= */
+
+downloadBtn.addEventListener("click",()=>{
+
+  if(!originalFile){
+    alert("Please select a photo first.");
+    return;
+  }
+
+  canvas.toBlob(function(blob){
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "Anshul-Photo-Hub-filtered.jpg";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    setTimeout(()=>{
+      URL.revokeObjectURL(url);
+    },1000);
+
+  },"image/jpeg",0.95);
+
+});
+
+
+updateValues();
+
+</script>
+
+</body>
+</html>
