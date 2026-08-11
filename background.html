@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Background Editor - Anshul Photo Hub</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    color:white;
+    background:linear-gradient(135deg,#0f172a,#312e81,#701a75);
+}
+
+header{
+    padding:16px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(0,0,0,.35);
+    backdrop-filter:blur(12px);
+    position:sticky;
+    top:0;
+    z-index:20;
+}
+
+.logo{
+    font-size:21px;
+    font-weight:bold;
+}
+
+.home{
+    color:white;
+    text-decoration:none;
+    background:rgba(255,255,255,.15);
+    padding:10px 15px;
+    border-radius:12px;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:25px 15px 50px;
+}
+
+.heading{
+    text-align:center;
+    margin-bottom:22px;
+}
+
+.heading h1{
+    font-size:32px;
+    margin-bottom:7px;
+}
+
+.heading p{
+    opacity:.8;
+}
+
+.upload{
+    border:2px dashed rgba(255,255,255,.4);
+    border-radius:20px;
+    padding:25px;
+    text-align:center;
+    background:rgba(255,255,255,.08);
+    margin-bottom:20px;
+}
+
+#photoInput{
+    display:none;
+}
+
+.upload label{
+    display:inline-block;
+    padding:14px 25px;
+    border-radius:13px;
+    cursor:pointer;
+    font-weight:bold;
+    background:linear-gradient(90deg,#7c3aed,#ec4899);
+}
+
+.editor{
+    display:grid;
+    grid-template-columns:1.5fr 1fr;
+    gap:20px;
+}
+
+.preview{
+    min-height:420px;
+    background:
+    repeating-conic-gradient(#eee 0 25%,#ddd 0 50%)
+    50% / 30px 30px;
+    border-radius:20px;
+    padding:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+canvas{
+    max-width:100%;
+    max-height:650px;
+    border-radius:12px;
+}
+
+.placeholder{
+    color:#222;
+    text-align:center;
+    font-weight:bold;
+}
+
+.controls{
+    background:rgba(255,255,255,.1);
+    border-radius:20px;
+    padding:20px;
+}
+
+.section{
+    margin-bottom:20px;
+}
+
+.section h3{
+    margin-bottom:12px;
+}
+
+.background-buttons{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+button{
+    border:none;
+    border-radius:10px;
+    padding:11px 8px;
+    color:white;
+    background:rgba(255,255,255,.15);
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    background:rgba(255,255,255,.3);
+}
+
+input[type=color]{
+    width:100%;
+    height:45px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:white;
+}
+
+input[type=range]{
+    width:100%;
+}
+
+.slider{
+    margin-top:14px;
+}
+
+.slider label{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:7px;
+    font-size:14px;
+}
+
+.action-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.download{
+    width:100%;
+    margin-top:12px;
+    background:linear-gradient(90deg,#16a34a,#059669);
+}
+
+.reset{
+    width:100%;
+    margin-top:8px;
+    background:#dc2626;
+}
+
+.status{
+    text-align:center;
+    margin-top:10px;
+    font-size:13px;
+    opacity:.8;
+}
+
+@media(max-width:800px){
+    .editor{
+        grid-template-columns:1fr;
+    }
+
+    .preview{
+        min-height:300px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">📸 Anshul Photo Hub</div>
+    <a href="index.html" class="home">← Home</a>
+</header>
+
+<div class="container">
+
+<div class="heading">
+    <h1>🖼️ Background Editor</h1>
+    <p>Change and customize your photo background</p>
+</div>
+
+<div class="upload">
+    <input type="file" id="photoInput" accept="image/*">
+    <label for="photoInput">📁 Choose Photo</label>
+    <p style="margin-top:10px;">JPG • PNG • WEBP</p>
+</div>
+
+<div class="editor">
+
+<div class="preview">
+
+    <div class="placeholder" id="placeholder">
+        <div style="font-size:50px;">🖼️</div>
+        Upload a photo to start
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+</div>
+
+<div class="controls">
+
+<div class="section">
+
+<h3>🎨 Background</h3>
+
+<div class="background-buttons">
+
+<button onclick="setBackground('white')">White</button>
+<button onclick="setBackground('black')">Black</button>
+<button onclick="setBackground('#2563eb')">Blue</button>
+<button onclick="setBackground('#16a34a')">Green</button>
+<button onclick="setBackground('#dc2626')">Red</button>
+<button onclick="setBackground('#f59e0b')">Gold</button>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<h3>🌈 Custom Color</h3>
+
+<input type="color" id="bgColor" value="#ffffff">
+
+</div>
+
+<div class="section">
+
+<h3>✨ Background Style</h3>
+
+<div class="background-buttons">
+
+<button onclick="setStyle('solid')">Solid</button>
+<button onclick="setStyle('gradient')">Gradient</button>
+<button onclick="setStyle('transparent')">Transparent</button>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<h3>🪄 Remove Background</h3>
+
+<div class="background-buttons">
+
+<button onclick="removeColor('green')">
+🟢 Green
+</button>
+
+<button onclick="removeColor('blue')">
+🔵 Blue
+</button>
+
+<button onclick="removeColor('auto')">
+✨ Auto
+</button>
+
+</div>
+
+</div>
+
+<div class="slider">
+
+<label>
+Zoom
+<span id="zoomText">100%</span>
+</label>
+
+<input
+type="range"
+id="zoom"
+min="50"
+max="180"
+value="100">
+</div>
+
+<div class="section" style="margin-top:18px">
+
+<h3>🔄 Transform</h3>
+
+<div class="action-grid">
+
+<button onclick="rotate(-90)">↶ Rotate</button>
+<button onclick="rotate(90)">↷ Rotate</button>
+<button onclick="flipHorizontal()">↔ Flip</button>
+<button onclick="resetTransform()">Reset</button>
+
+</div>
+
+</div>
+
+<button class="reset" onclick="resetAll()">
+♻️ Reset Everything
+</button>
+
+<button class="download" onclick="downloadImage()">
+⬇️ Download Photo
+</button>
+
+<div class="status" id="status">
+No photo selected
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const input = document.getElementById("photoInput");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const placeholder = document.getElementById("placeholder");
+const statusText = document.getElementById("status");
+
+let img = new Image();
+
+let background = "#ffffff";
+let backgroundStyle = "solid";
+
+let rotation = 0;
+let flip = 1;
+let zoom = 1;
+
+let removeMode = null;
+
+input.addEventListener("change",function(){
+
+    const file = this.files[0];
+
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload=function(e){
+
+        img.onload=function(){
+
+            placeholder.style.display="none";
+            canvas.style.display="block";
+
+            statusText.textContent="Photo loaded successfully";
+
+            draw();
+
+        };
+
+        img.src=e.target.result;
+    };
+
+    reader.readAsDataURL(file);
+});
+
+
+document.getElementById("bgColor")
+.addEventListener("input",function(){
+
+    background=this.value;
+
+    backgroundStyle="solid";
+
+    removeMode=null;
+
+    draw();
+
+});
+
+
+document.getElementById("zoom")
+.addEventListener("input",function(){
+
+    zoom=Number(this.value)/100;
+
+    document.getElementById("zoomText").textContent=
+        this.value+"%";
+
+    draw();
+
+});
+
+
+function setBackground(color){
+
+    background=color;
+
+    backgroundStyle="solid";
+
+    removeMode=null;
+
+    draw();
+
+}
+
+
+function setStyle(style){
+
+    backgroundStyle=style;
+
+    removeMode=null;
+
+    draw();
+
+}
+
+
+function removeColor(color){
+
+    removeMode=color;
+
+    backgroundStyle="transparent";
+
+    statusText.textContent=
+        "Background removal enabled";
+
+    draw();
+
+}
+
+
+function rotate(deg){
+
+    rotation+=deg;
+
+    draw();
+
+}
+
+
+function flipHorizontal(){
+
+    flip*=-1;
+
+    draw();
+
+}
+
+
+function resetTransform(){
+
+    rotation=0;
+
+    flip=1;
+
+    zoom=1;
+
+    document.getElementById("zoom").value=100;
+
+    document.getElementById("zoomText").textContent="100%";
+
+    draw();
+
+}
+
+
+function draw(){
+
+    if(!img.src) return;
+
+    let w=img.naturalWidth;
+    let h=img.naturalHeight;
+
+    let angle=Math.abs(rotation)%180;
+
+    if(angle===90){
+
+        canvas.width=h;
+
+        canvas.height=w;
+
+    }else{
+
+        canvas.width=w;
+
+        canvas.height=h;
+
+    }
+
+    /*
+       Draw background
+    */
+
+    if(backgroundStyle==="transparent"){
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    }else{
+
+        if(backgroundStyle==="gradient"){
+
+            let gradient=ctx.createLinearGradient(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+            gradient.addColorStop(0,background);
+
+            gradient.addColorStop(1,"#000000");
+
+            ctx.fillStyle=gradient;
+
+        }else{
+
+            ctx.fillStyle=background;
+
+        }
+
+        ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    }
+
+    /*
+       Image transform
+    */
+
+    ctx.save();
+
+    ctx.translate(
+        canvas.width/2,
+        canvas.height/2
+    );
+
+    ctx.rotate(
+        rotation*Math.PI/180
+    );
+
+    ctx.scale(
+        flip*zoom,
+        zoom
+    );
+
+    /*
+       Chroma key
+    */
+
+    if(removeMode){
+
+        let temp=document.createElement("canvas");
+
+        temp.width=w;
+
+        temp.height=h;
+
+        let tctx=temp.getContext("2d");
+
+        tctx.drawImage(
+            img,
+            0,
+            0,
+            w,
+            h
+        );
+
+        let data=tctx.getImageData(
+            0,
+            0,
+            w,
+            h
+        );
+
+        let pixels=data.data;
+
+        for(let i=0;i<pixels.length;i+=4){
+
+            let r=pixels[i];
+
+            let g=pixels[i+1];
+
+            let b=pixels[i+2];
+
+            let remove=false;
+
+            if(removeMode==="green"){
+
+                if(
+                    g>r*1.25 &&
+                    g>b*1.15 &&
+                    g>70
+                ){
+                    remove=true;
+                }
+
+            }
+
+            else if(removeMode==="blue"){
+
+                if(
+                    b>r*1.25 &&
+                    b>g*1.15 &&
+                    b>70
+                ){
+                    remove=true;
+                }
+
+            }
+
+            else{
+
+                if(
+                    g>r*1.35 &&
+                    g>b*1.15
+                ){
+                    remove=true;
+                }
+
+                if(
+                    b>r*1.35 &&
+                    b>g*1.05
+                ){
+                    remove=true;
+                }
+
+            }
+
+            if(remove){
+
+                pixels[i+3]=0;
+
+            }
+
+        }
+
+        tctx.putImageData(
+            data,
+            0,
+            0
+        );
+
+        ctx.drawImage(
+            temp,
+            -w/2,
+            -h/2,
+            w,
+            h
+        );
+
+    }else{
+
+        ctx.drawImage(
+            img,
+            -w/2,
+            -h/2,
+            w,
+            h
+        );
+
+    }
+
+    ctx.restore();
+
+}
+
+
+function resetAll(){
+
+    background="#ffffff";
+
+    backgroundStyle="solid";
+
+    removeMode=null;
+
+    rotation=0;
+
+    flip=1;
+
+    zoom=1;
+
+    document.getElementById("bgColor").value="#ffffff";
+
+    document.getElementById("zoom").value=100;
+
+    document.getElementById("zoomText").textContent="100%";
+
+    statusText.textContent="Effects reset";
+
+    draw();
+
+}
+
+
+function downloadImage(){
+
+    if(!img.src){
+
+        alert("Please upload a photo first.");
+
+        return;
+
+    }
+
+    const link=document.createElement("a");
+
+    link.download=
+        "Anshul-Photo-Hub-Background.png";
+
+    link.href=
+        canvas.toDataURL("image/png");
+
+    link.click();
+
+}
+
+</script>
+
+</body>
+</html>
