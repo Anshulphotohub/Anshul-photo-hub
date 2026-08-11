@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passport Photo Maker - Anshul Photo Hub</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#07111f,#172554,#312e81);
+  color:white;
+}
+
+header{
+  padding:16px 20px;
+  background:rgba(0,0,0,.35);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.logo{
+  font-weight:bold;
+  font-size:20px;
+}
+
+.home{
+  color:white;
+  text-decoration:none;
+  padding:9px 14px;
+  border-radius:10px;
+  background:rgba(255,255,255,.14);
+}
+
+.container{
+  width:min(1050px,94%);
+  margin:auto;
+  padding:25px 0 50px;
+}
+
+.title{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.title h1{
+  font-size:32px;
+  margin-bottom:8px;
+}
+
+.title p{
+  opacity:.8;
+}
+
+.card{
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:20px;
+  backdrop-filter:blur(12px);
+}
+
+.upload{
+  text-align:center;
+  padding:25px;
+  border:2px dashed rgba(255,255,255,.35);
+  border-radius:16px;
+}
+
+#fileInput{
+  display:none;
+}
+
+.upload label{
+  display:inline-block;
+  padding:13px 22px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+  background:linear-gradient(90deg,#7c3aed,#ec4899);
+}
+
+.settings{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+select,input[type=number]{
+  width:100%;
+  padding:12px;
+  border:1px solid #475569;
+  border-radius:10px;
+  background:#0f172a;
+  color:white;
+}
+
+.setting label{
+  display:block;
+  margin-bottom:7px;
+  font-size:14px;
+}
+
+.editor{
+  display:none;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.preview{
+  background:#111827;
+  border-radius:18px;
+  min-height:430px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  padding:15px;
+}
+
+canvas{
+  max-width:100%;
+  max-height:520px;
+  background:white;
+}
+
+.controls{
+  background:rgba(255,255,255,.06);
+  border-radius:18px;
+  padding:18px;
+}
+
+.control{
+  margin-bottom:17px;
+}
+
+.control label{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:7px;
+}
+
+input[type=range]{
+  width:100%;
+  accent-color:#a78bfa;
+}
+
+.buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:15px;
+}
+
+button{
+  border:0;
+  padding:12px;
+  border-radius:10px;
+  color:white;
+  background:#334155;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:.85;
+}
+
+.download{
+  width:100%;
+  margin-top:12px;
+  background:#16a34a;
+}
+
+.sheet{
+  width:100%;
+  margin-top:8px;
+  background:#2563eb;
+}
+
+.reset{
+  width:100%;
+  margin-top:8px;
+  background:#dc2626;
+}
+
+.info{
+  margin-top:12px;
+  text-align:center;
+  font-size:13px;
+  opacity:.7;
+}
+
+@media(max-width:800px){
+  .editor{
+    grid-template-columns:1fr;
+  }
+
+  .settings{
+    grid-template-columns:1fr;
+  }
+
+  .preview{
+    min-height:320px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">📸 Anshul Photo Hub</div>
+  <a href="index.html" class="home">← Home</a>
+</header>
+
+<div class="container">
+
+<div class="title">
+  <h1>🪪 Passport Photo Maker</h1>
+  <p>Create printable passport-size photos easily</p>
+</div>
+
+<div class="card">
+
+<div class="upload">
+  <input type="file" id="fileInput" accept="image/*">
+  <label for="fileInput">📁 Choose Photo</label>
+  <p style="margin-top:10px;">JPG, PNG or WEBP</p>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2 style="margin-bottom:15px;">📐 Photo Size</h2>
+
+<div class="settings">
+
+<div class="setting">
+<label>Preset</label>
+
+<select id="sizePreset">
+
+<option value="35x45">
+35 × 45 mm
+</option>
+
+<option value="2x2">
+2 × 2 inch
+</option>
+
+<option value="25x35">
+25 × 35 mm
+</option>
+
+<option value="30x40">
+30 × 40 mm
+</option>
+
+</select>
+</div>
+
+<div class="setting">
+
+<label>Photos per Sheet</label>
+
+<select id="copies">
+
+<option value="1">1 Photo</option>
+<option value="2">2 Photos</option>
+<option value="4">4 Photos</option>
+<option value="6">6 Photos</option>
+<option value="8">8 Photos</option>
+<option value="10">10 Photos</option>
+<option value="12" selected>12 Photos</option>
+<option value="16">16 Photos</option>
+
+</select>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card editor" id="editor">
+
+<div class="preview">
+  <canvas id="canvas"></canvas>
+</div>
+
+<div class="controls">
+
+<h2 style="margin-bottom:18px;">🎛️ Adjust</h2>
+
+<div class="control">
+
+<label>
+Zoom
+<span id="zoomValue">100%</span>
+</label>
+
+<input
+type="range"
+id="zoom"
+min="50"
+max="180"
+value="100">
+
+</div>
+
+<div class="control">
+
+<label>
+Brightness
+<span id="brightnessValue">100%</span>
+</label>
+
+<input
+type="range"
+id="brightness"
+min="50"
+max="150"
+value="100">
+
+</div>
+
+<div class="control">
+
+<label>
+Contrast
+<span id="contrastValue">100%</span>
+</label>
+
+<input
+type="range"
+id="contrast"
+min="50"
+max="150"
+value="100">
+
+</div>
+
+<div class="buttons">
+
+<button onclick="rotate(-90)">
+↶ Rotate
+</button>
+
+<button onclick="rotate(90)">
+↷ Rotate
+</button>
+
+<button onclick="flip()">
+↔ Flip
+</button>
+
+<button onclick="centerImage()">
+🎯 Center
+</button>
+
+</div>
+
+<button class="download" onclick="downloadPhoto()">
+⬇️ Download Photo
+</button>
+
+<button class="sheet" onclick="downloadSheet()">
+🖨️ Download Photo Sheet
+</button>
+
+<button class="reset" onclick="resetAll()">
+♻️ Reset
+</button>
+
+<div class="info">
+Photo size: <span id="sizeInfo">35 × 45 mm</span>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const fileInput=document.getElementById("fileInput");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+const sizePreset=document.getElementById("sizePreset");
+const copies=document.getElementById("copies");
+
+const zoom=document.getElementById("zoom");
+const brightness=document.getElementById("brightness");
+const contrast=document.getElementById("contrast");
+
+const zoomValue=document.getElementById("zoomValue");
+const brightnessValue=document.getElementById("brightnessValue");
+const contrastValue=document.getElementById("contrastValue");
+
+const editor=document.getElementById("editor");
+const sizeInfo=document.getElementById("sizeInfo");
+
+let img=new Image();
+let loaded=false;
+let rotation=0;
+let flipX=1;
+
+const sizes={
+  "35x45":{
+    width:413,
+    height:531,
+    text:"35 × 45 mm"
+  },
+
+  "2x2":{
+    width:600,
+    height:600,
+    text:"2 × 2 inch"
+  },
+
+  "25x35":{
+    width:295,
+    height:413,
+    text:"25 × 35 mm"
+  },
+
+  "30x40":{
+    width:354,
+    height:472,
+    text:"30 × 40 mm"
+  }
+};
+
+fileInput.addEventListener("change",function(){
+
+  const file=this.files[0];
+
+  if(!file)return;
+
+  if(!file.type.startsWith("image/")){
+    alert("Please select an image.");
+    return;
+  }
+
+  const reader=new FileReader();
+
+  reader.onload=function(e){
+
+    img.onload=function(){
+
+      loaded=true;
+
+      editor.style.display="grid";
+
+      draw();
+
+      editor.scrollIntoView({
+        behavior:"smooth"
+      });
+    };
+
+    img.src=e.target.result;
+
+  };
+
+  reader.readAsDataURL(file);
+
+});
+
+function getSize(){
+  return sizes[sizePreset.value];
+}
+
+function draw(){
+
+  if(!loaded)return;
+
+  const s=getSize();
+
+  canvas.width=s.width;
+  canvas.height=s.height;
+
+  ctx.fillStyle="white";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.save();
+
+  ctx.translate(
+    canvas.width/2,
+    canvas.height/2
+  );
+
+  ctx.rotate(
+    rotation*Math.PI/180
+  );
+
+  ctx.scale(
+    flipX*Number(zoom.value)/100,
+    Number(zoom.value)/100
+  );
+
+  ctx.filter=
+    `brightness(${brightness.value}%)
+     contrast(${contrast.value}%)`;
+
+  const imageRatio=
+    img.naturalWidth/img.naturalHeight;
+
+  const boxRatio=
+    canvas.width/canvas.height;
+
+  let w,h;
+
+  if(imageRatio>boxRatio){
+
+    h=canvas.height;
+    w=h*imageRatio;
+
+  }else{
+
+    w=canvas.width;
+    h=w/imageRatio;
+
+  }
+
+  ctx.drawImage(
+    img,
+    -w/2,
+    -h/2,
+    w,
+    h
+  );
+
+  ctx.restore();
+
+  sizeInfo.textContent=s.text;
+}
+
+zoom.addEventListener("input",function(){
+
+  zoomValue.textContent=this.value+"%";
+
+  draw();
+
+});
+
+brightness.addEventListener("input",function(){
+
+  brightnessValue.textContent=this.value+"%";
+
+  draw();
+
+});
+
+contrast.addEventListener("input",function(){
+
+  contrastValue.textContent=this.value+"%";
+
+  draw();
+
+});
+
+sizePreset.addEventListener("change",function(){
+
+  sizeInfo.textContent=getSize().text;
+
+  draw();
+
+});
+
+function rotate(deg){
+
+  rotation+=deg;
+
+  draw();
+
+}
+
+function flip(){
+
+  flipX*=-1;
+
+  draw();
+
+}
+
+function centerImage(){
+
+  rotation=0;
+  flipX=1;
+
+  draw();
+
+}
+
+function resetAll(){
+
+  rotation=0;
+  flipX=1;
+
+  zoom.value=100;
+  brightness.value=100;
+  contrast.value=100;
+
+  zoomValue.textContent="100%";
+  brightnessValue.textContent="100%";
+  contrastValue.textContent="100%";
+
+  sizePreset.value="35x45";
+
+  draw();
+
+}
+
+function downloadPhoto(){
+
+  if(!loaded){
+
+    alert("Please choose a photo first.");
+
+    return;
+  }
+
+  const link=document.createElement("a");
+
+  link.download=
+    "passport-photo-"+Date.now()+".jpg";
+
+  link.href=
+    canvas.toDataURL("image/jpeg",0.95);
+
+  link.click();
+
+}
+
+function downloadSheet(){
+
+  if(!loaded){
+
+    alert("Please choose a photo first.");
+
+    return;
+  }
+
+  const count=Number(copies.value);
+
+  const s=getSize();
+
+  const margin=35;
+
+  const columns=
+    count<=4 ? 2 : 4;
+
+  const rows=
+    Math.ceil(count/columns);
+
+  const sheetWidth=
+    columns*s.width+(columns+1)*margin;
+
+  const sheetHeight=
+    rows*s.height+(rows+1)*margin;
+
+  const sheet=
+    document.createElement("canvas");
+
+  sheet.width=sheetWidth;
+  sheet.height=sheetHeight;
+
+  const sc=
+    sheet.getContext("2d");
+
+  sc.fillStyle="white";
+
+  sc.fillRect(
+    0,
+    0,
+    sheet.width,
+    sheet.height
+  );
+
+  for(let i=0;i<count;i++){
+
+    const col=i%columns;
+    const row=Math.floor(i/columns);
+
+    const x=
+      margin+
+      col*(s.width+margin);
+
+    const y=
+      margin+
+      row*(s.height+margin);
+
+    sc.drawImage(
+      canvas,
+      x,
+      y,
+      s.width,
+      s.height
+    );
+
+  }
+
+  const link=document.createElement("a");
+
+  link.download=
+    "passport-photo-sheet-"+Date.now()+".jpg";
+
+  link.href=
+    sheet.toDataURL("image/jpeg",0.95);
+
+  link.click();
+
+}
+
+</script>
+
+</body>
+</html>
